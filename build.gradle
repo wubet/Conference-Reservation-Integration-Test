@@ -6,32 +6,15 @@ group 'org.uwb.edu.css533'
 version '1.0-SNAPSHOT'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+//    sourceCompatibility = JavaVersion.VERSION_11
+//    targetCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
     mavenCentral()
 }
 
-
 dependencies {
-
-//    testImplementation group: 'org.testng', name: 'testng', version: '7.5'
-//    testImplementation group: 'io.cucumber', name: 'cucumber-java', version: '7.2.3'
-//    testImplementation group: 'io.cucumber', name: 'cucumber-core', version: '7.2.3'
-//    testImplementation group: 'info.cukes', name: 'cucumber-picocontainer', version: '1.2.6', ext: 'pom'
-//
-//    implementation group: 'io.appium', name: 'java-client', version: '8.0.0'
-//    implementation group: 'io.cucumber', name: 'cucumber-jvm', version: '7.2.3', ext: 'pom'
-//    implementation group: 'io.cucumber', name: 'gherkin', version: '23.0.1'
-//    implementation group: 'io.cucumber', name: 'cucumber-testng', version: '7.2.3'
-//    implementation group: 'net.masterthought', name: 'cucumber-reporting', version: '5.7.0'
-//
-//
-//    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-
-
     testImplementation 'io.cucumber:cucumber-java:latest.release'
     testImplementation 'io.cucumber:cucumber-junit:latest.release'
     testImplementation 'io.cucumber:cucumber-core:latest.release'
@@ -39,7 +22,6 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2'
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.0.1'
-
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
@@ -56,34 +38,8 @@ dependencies {
 configurations {
     cucumberRuntime{
         extendsFrom testImplementation
-//        extendsFrom testImplementation
     }
 }
-
-//test {
-//    useJUnitPlatform {
-//        includeTags 'FeatureTests & FlakyTests'
-//    }
-//}
-
-//test {
-//    useJUnitPlatform()
-//}
-
-//tasks.withType(Test) {
-//    useJUnitPlatform()
-//    jvmArgs '--enable-preview'
-//}
-
-//test {
-//    useJUnitPlatform()
-//
-//    testLogging {
-//        events TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED
-//    }
-//
-//    systemProperties(project.gradle.startParameter.systemPropertiesArgs)
-//}
 
 test {
     testLogging.showStandardStreams = true
@@ -92,11 +48,7 @@ test {
 
 gradle.startParameter.continueOnFailure = true
 
-
-
-
-
-task cucumber() {
+task cucumberIntegration() {
     group 'cucumber bdd'
     description 'For executing Cucumber Integration Test'
     dependsOn assemble, testClasses
@@ -104,9 +56,6 @@ task cucumber() {
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-//            args = ['--dry-run', 'html:out/htmlReport.html', '--glue', 'src/test/java/cucumber/stepsDefinition', 'src/test/resources/features']
-//            args = ['--dry-run', '--plugin', 'pretty', '--glue', 'src/test/java/cucumber/stepsDefinition', 'src/test/resources/features']
-//            args = ['--plugin', 'pretty', '--glue', 'org.uwb.edu.css533.cucumber', 'src/test/resources']
             args = ['--plugin', 'html:out/htmlReport.html', '--glue', 'org.uwb.edu.css533.cucumber', 'src/test/resources']
         }
     }
