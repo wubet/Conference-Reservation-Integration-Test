@@ -2,27 +2,27 @@ package org.uwb.edu.css533.cucumber.test;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.path.json.JsonPath;
 import org.joda.time.DateTime;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 
 import static io.restassured.RestAssured.given;
 
 public class UserTestMethods extends BaseTest{
 
-    JSONObject requestParams = null;
+    JSONObject requestObject = null;
 
-    @BeforeClass
-    public void setup(){
-        RestAssured.baseURI = BASE_URL;
-    }
-
+    /**
+     * set up user url path
+     */
     public void setUpUserEndPointPath(){
         RestAssured.basePath = "/api/v1/users";
     }
 
+    /**
+     * submit room get list request
+     * @param page - request page index
+     */
     public void sendUserGetRequest(int page)
     {
         response = given().log().uri()
@@ -34,30 +34,42 @@ public class UserTestMethods extends BaseTest{
                 extract().response();
     }
 
+    /**
+     * validate user response
+     * @param emailID - expected user email id
+     */
     public void validateUserData(String emailID)
     {
         String userEmail = response.path("content[0].email_id");
         Assert.assertEquals(emailID, userEmail);
     }
 
-    public void setupUserEndpointAndPostData(String firstName, String lastName, String emailId)
+    /**
+     * prepare user post request payload data
+     * @param firstName - user first name
+     * @param lastName - user last name
+     * @param emailId - user email id
+     */
+    public void prepareUserPayloadPostData(String firstName, String lastName, String emailId)
     {
-        setUpUserEndPointPath();
-        requestParams = new JSONObject();
+        requestObject = new JSONObject();
         DateTime dateTime = new DateTime();
-        requestParams.put("first_name",firstName);
-        requestParams.put("last_name", lastName);
-        requestParams.put("email_id", emailId);
-        requestParams.put("createDateTime", dateTime);
-        requestParams.put("updateDateTime", dateTime);
+        requestObject.put("first_name",firstName);
+        requestObject.put("last_name", lastName);
+        requestObject.put("email_id", emailId);
+        requestObject.put("createDateTime", dateTime);
+        requestObject.put("updateDateTime", dateTime);
 
     }
 
+    /**
+     * submit user post request
+     */
     public void sendUserPostRequest()
     {
         response = given().log().uri()
                 .contentType(ContentType.JSON)
-                .body(requestParams.toString(1))
+                .body(requestObject.toString(1))
                 .when()
                 .post()
                 .then()
@@ -65,6 +77,11 @@ public class UserTestMethods extends BaseTest{
                 .extract().response();
     }
 
+    /**
+     * validate user response data
+     * @param code - expected response status code
+     * @param emailId - expected user email id
+     */
     public void validateUserResponse(int code, String emailId)
     {
         String userEmail = response.jsonPath().getString("email_id");
@@ -72,13 +89,18 @@ public class UserTestMethods extends BaseTest{
         Assert.assertEquals(code, response.statusCode());
     }
 
+    /**
+     * set up user url path with id
+     * @param id - user id
+     */
     public void setUpValidUserEndPointUrl(String id){
         RestAssured.basePath = "/api/v1/users/" + id;
     }
 
+    /**
+     *
+     */
     public void sendRequestToGetUserDetails(){
-        //setUpUserEndPointPath();
-        //RestAssured.basePath = "/api/v1/users/" + id;
         response = given().log().uri()
                 .contentType(ContentType.JSON)
                 .when()
@@ -88,33 +110,44 @@ public class UserTestMethods extends BaseTest{
                 .extract().response();
     }
 
+    /**
+     *
+     * @param code - expected response status code
+     * @param id
+     * @param emailId
+     */
     public void validateUserDetails(int code, int id, String emailId){
-//        ResponseBody body = response.getBody();
-//        String str = body.asString();
-        JsonPath jsonPathEvaluator = response.jsonPath();
-        int user_id = jsonPathEvaluator.get("user_id");
+        int user_id = response.jsonPath().get("user_id");
         String userEmail = response.jsonPath().getString("email_id");
         Assert.assertEquals(code, response.statusCode());
         Assert.assertEquals(id, user_id);
         Assert.assertEquals(emailId, userEmail);
     }
 
-    public void updatedUserDetailData(String firstName, String lastName, String emailId) {
-        //RestAssured.basePath = "/api/v1/users/" + id;
-        requestParams = new JSONObject();
+    /**
+     * prepare user update data
+     * @param firstName - user first name
+     * @param lastName - user last name
+     * @param emailId - user email id
+     */
+    public void prepareUserUpdateData(String firstName, String lastName, String emailId) {
+        requestObject = new JSONObject();
         DateTime dateTime = new DateTime();
-        requestParams.put("first_name",firstName);
-        requestParams.put("last_name", lastName);
-        requestParams.put("email_id", emailId);
-        requestParams.put("createDateTime", dateTime);
-        requestParams.put("updateDateTime", dateTime);
+        requestObject.put("first_name",firstName);
+        requestObject.put("last_name", lastName);
+        requestObject.put("email_id", emailId);
+        requestObject.put("createDateTime", dateTime);
+        requestObject.put("updateDateTime", dateTime);
 
     }
 
+    /**
+     * submit user put request
+     */
     public void sendUserPutRequest() {
         response = given().log().uri()
                 .contentType(ContentType.JSON)
-                .body(requestParams.toString(1))
+                .body(requestObject.toString(1))
                 .when()
                 .put()
                 .then()
@@ -122,6 +155,9 @@ public class UserTestMethods extends BaseTest{
                 .extract().response();
     }
 
+    /**
+     * submit room delete request
+     */
     public void sendUserDeleteRequest(){
 
         response = given().log().uri()
@@ -132,6 +168,10 @@ public class UserTestMethods extends BaseTest{
                 .extract().response();
     }
 
+    /**
+     * validate user response
+     * @param code - expected response status code
+     */
     public void validateUserResponse(int code)
     {
         Assert.assertEquals(code, response.statusCode());

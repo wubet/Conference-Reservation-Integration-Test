@@ -4,27 +4,31 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.uwb.edu.css533.cucumber.common.Context;
 
-import java.util.Date;
+import java.util.HashMap;
 
 import static io.restassured.RestAssured.given;
 
 public class RoomTestMethods extends BaseTest{
 
-    JSONObject requestParams = null;
+    JSONObject requestObject = null;
 
-    @BeforeClass
-    public void setup(){
-        RestAssured.baseURI = BASE_URL;
-    }
-
+    /**
+     * set up room url path
+     */
     public void setUpRoomEndPointPath(){
         RestAssured.basePath = "/api/v1/rooms";
     }
 
+    /**
+     * submit room get request
+     * @param page - request page index
+     */
     public void sendRoomGetRequest(int page)
     {
         response = given().log().uri()
@@ -36,32 +40,45 @@ public class RoomTestMethods extends BaseTest{
                 extract().response();
     }
 
+    /**
+     * validate room response data
+     * @param rmName - expected room name
+     */
     public void validateRoomData(String rmName)
     {
         String roomName = response.path("content[0].room_name");
         Assert.assertEquals(rmName, roomName);
     }
 
-    public void setupRoomEndpointAndPostData(int rmNumber, String rmName, int rmCapacity, String rmLocation, String rmType, String status)
-    {
-        setUpRoomEndPointPath();
-        requestParams = new JSONObject();
+    /**
+     * prepare room post request payload data
+     * @param rmNumber - room number
+     * @param rmName - room name
+     * @param rmCapacity - room capacity
+     * @param rmLocation - room location
+     * @param rmType - room type
+     * @param status - room status
+     */
+    public void prepareRoomPayloadPostData(int rmNumber, String rmName, int rmCapacity, String rmLocation, String rmType, String status){
+        requestObject = new JSONObject();
         DateTime dateTime = new DateTime();
-        requestParams.put("room_number", rmNumber);
-        requestParams.put("room_name", rmName);
-        requestParams.put("room_capacity", rmCapacity);
-        requestParams.put("room_location", rmLocation);
-        requestParams.put("room_type", rmType);
-        requestParams.put("status", status);
-        requestParams.put("createDateTime", dateTime);
-        requestParams.put("updateDateTime", dateTime);
+        requestObject.put("room_number", rmNumber);
+        requestObject.put("room_name", rmName);
+        requestObject.put("room_capacity", rmCapacity);
+        requestObject.put("room_location", rmLocation);
+        requestObject.put("room_type", rmType);
+        requestObject.put("status", status);
+        requestObject.put("createDateTime", dateTime);
+        requestObject.put("updateDateTime", dateTime);
     }
 
-    public void sendRoomPostRequest()
-    {
+    /**
+     * submit room post request
+     */
+    public void sendRoomPostRequest(){
         response = given().log().uri()
                 .contentType(ContentType.JSON)
-                .body(requestParams.toString(1))
+                .body(requestObject.toString(1))
                 .when()
                 .post()
                 .then()
@@ -69,19 +86,29 @@ public class RoomTestMethods extends BaseTest{
                 .extract().response();
     }
 
-    public void validateRoomResponse(int code, String rmName)
-    {
+    /**
+     * validate room response
+     * @param code expected response status code
+     * @param rmName - expected room name
+     */
+    public void validateRoomResponse(int code, String rmName){
         String roomName = response.jsonPath().getString("room_name");
         Assert.assertEquals(rmName, roomName);
         Assert.assertEquals(code, response.statusCode());
     }
 
+    /**
+     * set up room url path with id
+     * @param id room id
+     */
     public void setUpValidRoomEndPointUrl(String id){
         RestAssured.basePath = "/api/v1/rooms/" + id;
     }
 
+    /**
+     * submit room get id request
+     */
     public void sendRequestToGetRoomDetails(){
-        //RestAssured.basePath = "/api/v1/rooms/" + id;
         response = given().log().uri()
                 .contentType(ContentType.JSON)
                 .when()
@@ -91,34 +118,55 @@ public class RoomTestMethods extends BaseTest{
                 .extract().response();
     }
 
+    /**
+     * validate room response detail
+     * @param code expected response status code
+     * @param id expected room id
+     * @param rmName expected room name
+     */
     public void validateRoomDetails(int code, int id, String rmName){
-//        ResponseBody body = response.getBody();
-//        String str = body.asString();
-        JsonPath jsonPathEvaluator = response.jsonPath();
-        int room_id = jsonPathEvaluator.get("room_id");
+        int room_id = response.jsonPath().get("room_id");
         String roomName = response.jsonPath().getString("room_name");
+        int reservation_id = response.jsonPath().get("reservations[0].reservation_id");
+        String meetingTime = response.jsonPath().getString("reservations[0].meeting_start_time");
+
+        scenarioContext.setContext(Context.RESERVATION_ID, reservation_id);
+        scenarioContext.setContext(Context.ROOM_ID, room_id);
+        scenarioContext.setContext(Context.MEETING_START_TIME, meetingTime);
         Assert.assertEquals(code, response.statusCode());
         Assert.assertEquals(id, room_id);
         Assert.assertEquals(rmName, roomName);
     }
 
-    public void updatedRoomDetailData(int rmNumber, String rmName, int rmCapacity, String rmLocation, String rmType, String status) {
-        requestParams = new JSONObject();
+    /**
+     * prepare room update data
+     * @param rmNumber - room number
+     * @param rmName - room name
+     * @param rmCapacity - room capacity
+     * @param rmLocation - room location
+     * @param rmType - room type
+     * @param status - room status
+     */
+    public void prepareRoomUpdateData(int rmNumber, String rmName, int rmCapacity, String rmLocation, String rmType, String status) {
+        requestObject = new JSONObject();
         DateTime dateTime = new DateTime();
-        requestParams.put("room_number", rmNumber);
-        requestParams.put("room_name", rmName);
-        requestParams.put("room_capacity", rmCapacity);
-        requestParams.put("room_location", rmLocation);
-        requestParams.put("room_type", rmType);
-        requestParams.put("status", status);
-        requestParams.put("createDateTime", dateTime);
-        requestParams.put("updateDateTime", dateTime);
+        requestObject.put("room_number", rmNumber);
+        requestObject.put("room_name", rmName);
+        requestObject.put("room_capacity", rmCapacity);
+        requestObject.put("room_location", rmLocation);
+        requestObject.put("room_type", rmType);
+        requestObject.put("status", status);
+        requestObject.put("createDateTime", dateTime);
+        requestObject.put("updateDateTime", dateTime);
     }
 
+    /**
+     * submit room put request
+     */
     public void sendRoomPutRequest() {
         response = given().log().uri()
                 .contentType(ContentType.JSON)
-                .body(requestParams.toString(1))
+                .body(requestObject.toString(1))
                 .when()
                 .put()
                 .then()
@@ -126,6 +174,9 @@ public class RoomTestMethods extends BaseTest{
                 .extract().response();
     }
 
+    /**
+     * submit room delete request
+     */
     public void sendRoomDeleteRequest(){
 
         response = given().log().uri()
@@ -136,20 +187,76 @@ public class RoomTestMethods extends BaseTest{
                 .extract().response();
     }
 
+    /**
+     * validate room response
+     * @param code expected response status code
+     */
     public void validateRoomResponse(int code)
     {
         Assert.assertEquals(code, response.statusCode());
     }
 
-    public void validateRoomDetail(int code, String rmName){
-        JsonPath jsonPathEvaluator = response.jsonPath();
-        meetingTime = jsonPathEvaluator.get("reservations.meeting_start_time");
-        String roomName = response.jsonPath().getString("room_name");
-        Assert.assertEquals(code, response.statusCode());
-        Assert.assertEquals(rmName, roomName);
+    /**
+     * get booked room id and its starting time and ending time from test context
+     * @param id booked room id
+     */
+    public void bookedRoomDetailedData(int id){
+        int room_id = id;
+        int reservation_id = 2;
+        DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        DateTime meetingTime = format.parseDateTime("2022-05-07 07:30:00");
+        scenarioContext.setContext(Context.RESERVATION_ID, reservation_id);
+        scenarioContext.setContext(Context.ROOM_ID, room_id);
+        scenarioContext.setContext(Context.MEETING_START_TIME, meetingTime);
+
+        DateTime meetingDateTime = new DateTime(scenarioContext.getContext(Context.MEETING_START_TIME));
+        startDate =  meetingDateTime.minusMinutes(15);
+        endDate = startDate.plusHours(1);
     }
 
+    /**
+     * set up rooms availability url
+     */
     public void setRoomAvailabilityEndPointUrl(){
         RestAssured.basePath = "/api/v1/rooms/availability";
+    }
+
+    /**
+     * submit room availability get request
+     * @param page - request page index
+     */
+    public void sendRequestToGetRoomAvailability(int page){
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("page",page);
+        map.put("startTime",startDate);
+        map.put("endTime",endDate);
+
+        response = given().log().uri()
+                .queryParams(map)
+                .when()
+                .get()
+                .then()
+                .contentType(ContentType.JSON)
+                .extract().response();
+    }
+
+    /**
+     * validate a room booked with in a given duration is not returned in the response
+     * @param code expected response status code
+     * @param id not expected room id
+     * @param rmName not expected room name
+     */
+    public void validateRoomAvailabilityDetail(int code, int id, String rmName){
+
+        JsonPath js = new JsonPath(response.asString());
+        int size = js.getInt("content.size()");
+        Assert.assertEquals(code, response.statusCode());
+        for(int i = 0; i < size; i++)
+        {
+            int rmId = js.get("content["+i+"].room_id");
+            String roomName = js.getString("content["+i+"].room_name");
+            Assert.assertNotEquals(id, rmId);
+            Assert.assertNotEquals(rmName, roomName);
+        }
     }
 }

@@ -49,6 +49,8 @@ dependencies {
     implementation group: 'net.masterthought', name: 'cucumber-reporting', version: '5.7.0'
     implementation group: 'io.cucumber', name: 'cucumber-testng', version: '7.2.3'
     implementation group: 'org.json', name: 'json', version: '20220320'
+    implementation group: 'com.googlecode.maven-properties-enum-plugin', name: 'maven-properties-enum-plugin', version: '1.1.4'
+
 }
 
 configurations {
@@ -104,8 +106,8 @@ task cucumber() {
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
 //            args = ['--dry-run', 'html:out/htmlReport.html', '--glue', 'src/test/java/cucumber/stepsDefinition', 'src/test/resources/features']
 //            args = ['--dry-run', '--plugin', 'pretty', '--glue', 'src/test/java/cucumber/stepsDefinition', 'src/test/resources/features']
-            args = ['--plugin', 'pretty', '--glue', 'org.uwb.edu.css533.cucumber', 'src/test/resources']
-//            args = ['--plugin', 'html:out/htmlReport.html', '--glue', 'org.uwb.edu.css533.cucumber', 'src/test/resources']
+//            args = ['--plugin', 'pretty', '--glue', 'org.uwb.edu.css533.cucumber', 'src/test/resources']
+            args = ['--plugin', 'html:out/htmlReport.html', '--glue', 'org.uwb.edu.css533.cucumber', 'src/test/resources']
         }
     }
 }

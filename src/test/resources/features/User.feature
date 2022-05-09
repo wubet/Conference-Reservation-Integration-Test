@@ -12,20 +12,8 @@ Feature: User Resource Test
 
 
   @SmokeTest @IntegrationTest
-  Scenario Outline: Request User POST API test
-    Given a valid endpoint with "<firstName>" and "<lastName>" and "<emailID>" payload to create a user
-    When request is send to the server to create user
-    Then the new user must be created with status code of "<statusCode>" and email as "<emailID>"
-    Examples:
-      |statusCode |firstName            |lastName         |emailID              |
-      |201        |Davide               |Perdu            |davide@gmail.com     |
-      |201        |James                |Coby             |JCoby@gmail.com      |
-      |201        |Jim                  |Jordan           |JJordan@gmail.com    |
-
-
-  @SmokeTest @IntegrationTest
   Scenario Outline: Send a valid Request to get user details
-    Given a request URL with valid "<id>" id to get user details
+    Given a request endpoint with valid "<id>" id to get user details
     When request is send to the server to get user details
     Then the response will return "<statusCode>" and "<id>" and "<emailId>" of the user
     Examples:
@@ -39,8 +27,20 @@ Feature: User Resource Test
     When request is send to the server to update a user
     Then the user must be updated with status code of "<statusCode>" and new email as "<emailID>"
     Examples:
-      |id |statusCode |firstName        |lastName         |emailID              |
-      |3  |200        |Berni            |Sanders          |BerniSa@gmail.com    |
+      |id |statusCode |firstName        |lastName         |emailID                |
+      |9  |200        |Dean             |Ruiz             |Dean.Ruiz@yahoo.com    |
+
+  @SmokeTest @IntegrationTest
+  Scenario Outline: Request User POST API test
+    Given a valid endpoint to create users
+    And a valid payload of "<firstName>" and "<lastName>" and "<emailID>" user
+    When request is send to the server to create user
+    Then the new user must be created with status code of "<statusCode>" and email as "<emailID>"
+    Examples:
+      |statusCode |firstName            |lastName         |emailID              |
+      |201        |Davide               |Perdu            |davide@gmail.com     |
+      |201        |James                |Coby             |JCoby@gmail.com      |
+      |201        |Jim                  |Jordan           |JJordan@gmail.com    |
 
   @SmokeTest @IntegrationTest
   Scenario Outline: Request Delete User API test
@@ -48,5 +48,5 @@ Feature: User Resource Test
     When request is send to the server to delete a user
     Then the user must be deleted with status code of "<statusCode>"
     Examples:
-      |statusCode   |id   |
-      | 204         |9    |
+      |id   |statusCode   |
+      |12   | 204         |
